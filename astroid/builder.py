@@ -48,7 +48,11 @@ if sys.version_info >= (3, 0):
         with open(filename, 'rb') as byte_stream:
             encoding = detect_encoding(byte_stream.readline)[0]
         stream = open(filename, 'r', newline=None, encoding=encoding)
-        data = stream.read()
+        # skip first line for py2bat files simulate python -x behavior
+        data = stream.read(1)
+        if data == r'@':
+            data = r'#'
+        data += stream.read()
         return stream, encoding, data
 
 else:
@@ -69,7 +73,11 @@ else:
     def open_source_file(filename):
         """get data for parsing a file"""
         stream = open(filename, 'U')
-        data = stream.read()
+        # skip first line for py2bat files simulate python -x behavior
+        data = stream.read(1)
+        if data == r'@':
+            data = r'#'
+        data += stream.read()
         encoding = _guess_encoding(data)
         return stream, encoding, data
 
